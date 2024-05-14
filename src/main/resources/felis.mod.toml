@@ -1,0 +1,11 @@
+schema = 1
+name = "Mixin"
+modid = "mixin"
+description = """
+An implementation of FabricMC's mixin fork on Felis.
+"""
+version = "${version}"
+
+[[entrypoints]]
+id = "loader_plugin"
+specifier = "io.github.joemama.spongemixins.MixinLoaderPlugin"

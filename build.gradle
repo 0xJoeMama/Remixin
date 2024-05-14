@@ -1,5 +1,5 @@
 plugins {
-    id "felis-dam" version "1.8.2-alpha"
+    id "felis-dam" version "1.10.0-alpha"
 }
 
 group = mod_group
@@ -9,14 +9,22 @@ loaderMake {
     version = minecraft_version
 }
 
+repositories {
+    mavenLocal()
+    maven {
+        url = "https://maven.fabricmc.net/"
+        name = "Fabric Maven"
+    }
+}
+
 dependencies {
     implementation("felis:felis:${felis_version}")
-    implementation("felis:kittens:${kittens_version}")
-    implementation("felis:micromixin:${micromixin_version}")
+    implementation("com.google.auto.service:auto-service:1.1.1")
+    api("net.fabricmc:sponge-mixin:0.13.4+mixin.0.8.5")
 }
 
 processResources {
-    filesMatching("mods.toml") {
+    filesMatching("felis.mod.toml") {
         expand "version": project.version
     }
 }
