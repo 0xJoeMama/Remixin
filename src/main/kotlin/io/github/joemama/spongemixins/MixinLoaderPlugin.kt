@@ -1,5 +1,6 @@
 package io.github.joemama.spongemixins
 
+import com.llamalad7.mixinextras.MixinExtrasBootstrap
 import felis.LoaderPluginEntrypoint
 import felis.ModLoader
 import felis.meta.ModMetadataExtended
@@ -12,7 +13,7 @@ import org.spongepowered.asm.service.MixinService
 
 object MixinLoaderPlugin : LoaderPluginEntrypoint {
     private val ModMetadataExtended.mixins: String?
-        get() = this["mixin"]?.asTomlLiteral()?.toString()
+        get() = this["mixins"]?.asTomlLiteral()?.toString()
 
     override fun onLoaderInit() {
         // initialize mixins
@@ -27,6 +28,8 @@ object MixinLoaderPlugin : LoaderPluginEntrypoint {
         val environment = MixinEnvironment.getEnvironment(Phase.DEFAULT)
         // grab our transformer
         val transformer = (MixinService.getService() as FelisMixinService).transformer
+        // initialize mixin extras
+        MixinExtrasBootstrap.init()
         // don't transform the mixin package
         ModLoader.transformer.ignored.ignorePackage("org.spongepowered")
         // register our transformations

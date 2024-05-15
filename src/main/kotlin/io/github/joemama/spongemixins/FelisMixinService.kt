@@ -18,10 +18,8 @@ class FelisMixinService : IMixinService, IClassProvider, IClassBytecodeProvider,
     lateinit var transformer: IMixinTransformer
     private val lock = ReEntranceLock(1)
 
-    // TODO: Change when we get a legit name
+    // @section IMixinService
     override fun getName(): String = "Felis"
-
-    // TODO: change once we get legit side handling
     override fun getSideName(): String = ModLoader.side.name
     override fun isValid(): Boolean = true
     override fun getClassProvider(): IClassProvider = this
@@ -29,11 +27,6 @@ class FelisMixinService : IMixinService, IClassProvider, IClassBytecodeProvider,
     override fun getTransformerProvider(): ITransformerProvider = this
     override fun getClassTracker(): IClassTracker = this
     override fun getAuditTrail(): IMixinAuditTrail? = null
-    override fun getPlatformAgents(): Collection<String> =
-        listOf("org.spongepowered.asm.launch.platform.MixinPlatformAgentDefault")
-
-    override fun getPrimaryContainer(): IContainerHandle =
-        ContainerHandleURI(ModLoader::class.java.protectionDomain.codeSource.location.toURI())
     override fun getResourceAsStream(name: String): InputStream? = ModLoader.classLoader.getResourceAsStream(name)
     override fun prepare() = Unit
     override fun getInitialPhase(): MixinEnvironment.Phase = MixinEnvironment.Phase.PREINIT
@@ -42,30 +35,49 @@ class FelisMixinService : IMixinService, IClassProvider, IClassBytecodeProvider,
     override fun checkEnv(o: Any) = Unit
     override fun getReEntranceLock(): ReEntranceLock = this.lock
     override fun getMixinContainers(): Collection<IContainerHandle> = listOf()
+    override fun getLogger(name: String): ILogger = this.logger
     override fun getMinCompatibilityLevel(): MixinEnvironment.CompatibilityLevel =
         MixinEnvironment.CompatibilityLevel.JAVA_8
 
     override fun getMaxCompatibilityLevel(): MixinEnvironment.CompatibilityLevel =
         MixinEnvironment.CompatibilityLevel.JAVA_17
 
-    override fun getLogger(name: String): ILogger = this.logger
+    override fun getPlatformAgents(): Collection<String> =
+        listOf("org.spongepowered.asm.launch.platform.MixinPlatformAgentDefault")
 
+    override fun getPrimaryContainer(): IContainerHandle =
+        ContainerHandleURI(ModLoader::class.java.protectionDomain.codeSource.location.toURI())
+    // @section end
+
+
+    // @section IClassProvider
     @Deprecated("Deprecated in Java", ReplaceWith("i have no idea, ask mixins"))
     override fun getClassPath(): Array<out URL> = arrayOf()
     override fun findClass(name: String): Class<*>? = ModLoader.classLoader.findClass(name)
     override fun findClass(name: String, resolve: Boolean): Class<*>? =
         Class.forName(name, resolve, ModLoader.classLoader)
+
     override fun findAgentClass(name: String, resolve: Boolean): Class<*> =
         Class.forName(name, resolve, ModLoader::class.java.classLoader)
+    // @section end
+
+    // @section IClassBytecodeProvider
     override fun getClassNode(name: String): ClassNode? = this.getClassNode(name, true)
     override fun getClassNode(name: String, runTransformers: Boolean): ClassNode? =
         ModLoader.classLoader.getClassData(name)?.node
+    // @section end
+
+    // @section ITransformerProvider
     override fun getTransformers(): Collection<ITransformer> = listOf()
     override fun getDelegatedTransformers(): Collection<ITransformer> = listOf()
+    // @section end
+
+    // @section IClassTracker
     override fun addTransformerExclusion(name: String) = Unit
     override fun registerInvalidClass(name: String) = Unit
     override fun isClassLoaded(name: String): Boolean = false
     override fun getClassRestrictions(name: String): String = ""
+    // @section end
 
     override fun offer(internal: IMixinInternal) {
         if (internal is IMixinTransformerFactory) {
